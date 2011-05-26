@@ -1,0 +1,21 @@
+<?php
+
+// $Id$
+/**
+ * @file
+ * Project Browser Server
+ */
+
+/**
+ * Display help and module information
+ */
+function project_browser_server_help($path, $arg) {
+  $output = '';
+  switch ($path) {
+    case "admin/help#project_browser_server":
+      $output .= '<p>'.  t("Provides an extensible API that lets you serve search results to the 
+      Project Browser module.") .'</p>';
+      break;
+  }
+  return $output;
+}
