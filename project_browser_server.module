@@ -1,0 +1,167 @@
+<?php
+
+// $Id$
+/**
+ * @file
+ * Project Browser Server module.
+ * @author Leighton Whiting
+ */
+
+/**
+ * Display help and module information
+ */
+function project_browser_server_help($path, $arg) {
+  $output = '';
+  switch ($path) {
+    case "admin/help#project_browser_server":
+      $output .= '<p>'.  t("Provides an extensible API that lets you serve search results to the 
+      Project Browser module.") .'</p>';
+      break;
+  }
+  return $output;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function project_browser_server_permission() {
+  return array(
+    'access project browser server' => array(
+      'title' => t('Access Project Browser Server'),
+      'description' => t('This must be enabled for anonymous users if you want them to access your server.'),
+    )
+  );
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function project_browser_server_menu() {
+  $items = array();
+  $items['project_browser/server'] = array(
+    'description' => 'A page that can be queried and returns XML',
+    'page callback' => 'project_browser_server_endpoint',
+    'access arguments' => array('access project browser server'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+// ======================================
+// Pages:
+// ======================================
+
+/**
+ * Page callback for the 'project_browser/server' endpoint. 
+ * Queries should be sent via $_POST
+ * 
+ * @return
+ *   Prints out the XML of the results
+ */
+function project_browser_server_endpoint() {
+	// Check that we have valid data
+	if (!isset($_REQUEST['drupal_version'])) {
+		return t('You must specify a drupal version.');
+	}
+  if (!isset($_REQUEST['type'])) {
+    return t('You must specify a project type.');
+  }
+	
+	// Get the queries and pass them off to the project_browser_server_get_results() function
+	$queries = array(
+    'drupal_version' => $_REQUEST['drupal_version'],
+    'text' => isset($_REQUEST['text']) ? $_REQUEST['text'] : '',
+	  'type' => $_REQUEST['type'],
+	);
+	
+	$results = project_browser_server_get_results($queries);
+	
+	// Serve this up as XML
+	
+	// Set page headers for the XML response.
+  header('Content-Type: text/xml; charset=utf-8');
+	
+	$xml = '<?xml version="1.0" encoding="utf-8"?>' ."\n";
+	
+	$xml .= "<results>";
+	
+	foreach ($results as $short_name => $result) {
+		$xml .= "
+<result>
+  <short_name>$short_name</short_name>
+  <title>{$result['title']}</title>
+  <type>{$result['type']}</type>
+  <author>{$result['author']}</author>
+  <description>{$result['description']}</description>
+  <image>{$result['image']}</image>
+  <usage>{$result['usage']}</usage>
+  <project_url>{$result['project_url']}</project_url>
+  <update_url>{$result['update_url']}</update_url>
+</result>
+";
+	}
+	
+	$xml .= "</results>";
+	
+  print $xml;
+  
+  exit();
+}
+
+// ======================================
+// Functions:
+// ======================================
+
+/**
+ * Implementation of hook_xmlrpc().
+ * 
+ * @return
+ *   Returns an array of xmlrpc functions
+ */
+function project_browser_server_xmlrpc() {
+	return array(
+    'project_browser_server.search' => 'project_browser_server_get_results',
+  );
+}
+
+/**
+ * Invokes hook_project_browser_server_query to get results of a search query
+ * 
+ * The hook_project_browser_server_query function takes a $queries parameter that looks like this:
+ * 
+ * array(
+ *   'drupal_version' => '6', // The Major Version of Drupal that is running on the Client
+ *   'text' => 'Views', // The text that was entered as the search query, or 'all'
+ *   'type' => 'module', // The type of project being searched
+ * )
+ * 
+ * The hook_project_browser_server_query($queries) call should return an array like this:
+ * 
+ * array(
+ *   'views' => array(
+ *     'type' => 'module', // The type of project this is. Can be 'module' or 'theme'
+ *     'title' => 'Views',
+ *     'author' => 'merlinofchaos',
+ *     'description' => "Long project description ...",
+ *     'image' => 'http://www.example.com/image.jpg', // Absolute url to the image, if any
+ *     'usage' => '542312', // How many Downloads the module has had
+ *     'project_url' => 'http://www.drupal.org/projects/views', // Absolute url to the project page, if any
+ *     'update_url' => 'http://updates.drupal.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Drupal.org Update Status does it
+ *     'last_updated' => '12342523', // UNIX Timestamp of when the project was last updated
+ *     'rating' => '9.6', // A rating on a scale of 1 to 10 of the project, if available
+ *   ),
+ *   'short_name_2 => array( ... ),
+ * );
+ * 
+ * @param $queries
+ *   An associative array of the filters and their values
+ * @return array
+ *   Returns an array of results, formatted how Project Browser likes it
+ */
+function project_browser_server_get_results($queries) {
+	$results = module_invoke_all('project_browser_server_query', $queries);
+  
+  // TODO - Maybe do some error checking here to ensure proper formatting
+  
+	return $results;
+}
