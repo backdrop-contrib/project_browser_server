@@ -24,7 +24,7 @@ function project_browser_server_help($path, $arg) {
 /**
  * Implementation of hook_perm().
  */
-function ms_core_permission() {
+function project_browser_server_permission() {
   return array(
     'access project browser server' => array(
       'title' => t('Access Project Browser Server'),
@@ -44,16 +44,12 @@ function project_browser_server_menu() {
     'access arguments' => array('access project browser server'),
     'type' => MENU_CALLBACK,
   );
-  $items['admin/project_browser_server'] = array(
-    'title' => 'Project Browser Server Settings',
-    'description' => 'Set the various Project Browser Server Settings here',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('project_browser_server_admin'),
-    'access arguments' => array('access administration pages'),
-    'type' => MENU_NORMAL_ITEM,
-  );
   return $items;
 }
+
+// ======================================
+// Pages:
+// ======================================
 
 /**
  * Page callback for the 'project_browser/server' endpoint. 
@@ -112,6 +108,10 @@ function project_browser_server_endpoint() {
   exit();
 }
 
+// ======================================
+// Functions:
+// ======================================
+
 /**
  * Implementation of hook_xmlrpc().
  * 
@@ -131,7 +131,7 @@ function project_browser_server_xmlrpc() {
  * 
  * array(
  *   'drupal_version' => '6', // The Major Version of Drupal that is running on the Client
- *   'text' => 'Views', // The text that was entered as the search query
+ *   'text' => 'Views', // The text that was entered as the search query, or 'all'
  *   'type' => 'module', // The type of project being searched
  * )
  * 
@@ -147,6 +147,8 @@ function project_browser_server_xmlrpc() {
  *     'usage' => '542312', // How many Downloads the module has had
  *     'project_url' => 'http://www.drupal.org/projects/views', // Absolute url to the project page, if any
  *     'update_url' => 'http://updates.drupal.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Drupal.org Update Status does it
+ *     'last_updated' => '12342523', // UNIX Timestamp of when the project was last updated
+ *     'rating' => '9.6', // A rating on a scale of 1 to 10 of the project, if available
  *   ),
  *   'short_name_2 => array( ... ),
  * );
