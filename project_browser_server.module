@@ -68,13 +68,13 @@ function project_browser_server_endpoint() {
   }
 	
 	// Get the queries and pass them off to the project_browser_server_get_results() function
-	$queries = array(
+	$filters = array(
     'drupal_version' => $_REQUEST['drupal_version'],
     'text' => isset($_REQUEST['text']) ? $_REQUEST['text'] : '',
 	  'type' => $_REQUEST['type'],
 	);
 	
-	$results = project_browser_server_get_results($queries);
+	$results = project_browser_server_get_results($filters);
 	
 	// Serve this up as XML
 	
@@ -119,6 +119,7 @@ function project_browser_server_endpoint() {
  *   Returns an array of xmlrpc functions
  */
 function project_browser_server_xmlrpc() {
+  // TODO - Add a new function to get the available categories
 	return array(
     'project_browser_server.search' => 'project_browser_server_get_results',
   );
@@ -127,20 +128,21 @@ function project_browser_server_xmlrpc() {
 /**
  * Invokes hook_project_browser_server_query to get results of a search query
  * 
- * The hook_project_browser_server_query function takes a $queries parameter that looks like this:
+ * The hook_project_browser_server_query function takes a $filters parameter that looks like this:
  * 
  * array(
- *   'drupal_version' => '6', // The Major Version of Drupal that is running on the Client
+ *   'drupal_version' => '6.x', // The Major Version of Drupal that is running on the Client
  *   'text' => 'Views', // The text that was entered as the search query, or 'all'
  *   'type' => 'module', // The type of project being searched
  * )
  * 
- * The hook_project_browser_server_query($queries) call should return an array like this:
+ * The hook_project_browser_server_query($filters) call should return an array like this:
  * 
  * array(
  *   'views' => array(
  *     'type' => 'module', // The type of project this is. Can be 'module' or 'theme'
  *     'title' => 'Views',
+ *     'short_name' => 'views',
  *     'author' => 'merlinofchaos',
  *     'description' => "Long project description ...",
  *     'image' => 'http://www.example.com/image.jpg', // Absolute url to the image, if any
@@ -149,6 +151,9 @@ function project_browser_server_xmlrpc() {
  *     'update_url' => 'http://updates.drupal.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Drupal.org Update Status does it
  *     'last_updated' => '12342523', // UNIX Timestamp of when the project was last updated
  *     'rating' => '9.6', // A rating on a scale of 1 to 10 of the project, if available
+ *     'dependencies' => array( // An array of the dependencies of this module
+ *         'ctools',
+ *       ),
  *   ),
  *   'short_name_2 => array( ... ),
  * );
@@ -158,8 +163,8 @@ function project_browser_server_xmlrpc() {
  * @return array
  *   Returns an array of results, formatted how Project Browser likes it
  */
-function project_browser_server_get_results($queries) {
-	$results = module_invoke_all('project_browser_server_query', $queries);
+function project_browser_server_get_results($filters) {
+	$results = module_invoke_all('project_browser_server_query', $filters);
   
   // TODO - Maybe do some error checking here to ensure proper formatting
   
