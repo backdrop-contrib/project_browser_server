@@ -119,9 +119,9 @@ function project_browser_server_endpoint() {
  *   Returns an array of xmlrpc functions
  */
 function project_browser_server_xmlrpc() {
-  // TODO - Add a new function to get the available categories
 	return array(
-    'project_browser_server.search' => 'project_browser_server_get_results',
+    'project_browser_server.fetch_results' => 'project_browser_server_get_results',
+    'project_browser_server.fetch_categories' => 'project_browser_server_get_categories',
   );
 }
 
@@ -169,4 +169,26 @@ function project_browser_server_get_results($filters) {
   // TODO - Maybe do some error checking here to ensure proper formatting
   
 	return $results;
+}
+
+/**
+ * Invokes hook_project_browser_server_categories to get a list of categories
+ * 
+ * The hook_project_browser_server_categories($type) call should return an array like this:
+ * 
+ * array(
+ *   "Category 1", 
+ *   "Category 2", 
+ *   "Category 3",
+ * );
+ * 
+ * @param $type
+ *   The type of project to get the categories for, 'module' or 'theme'
+ * @return array
+ *   Returns an array of categories
+ */
+function project_browser_server_get_categories($type) {
+  $categories = module_invoke_all('project_browser_server_categories', $type);
+  
+  return $categories;
 }
