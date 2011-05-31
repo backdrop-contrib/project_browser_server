@@ -85,18 +85,25 @@ function project_browser_server_endpoint() {
 	
 	$xml .= "<results>";
 	
-	foreach ($results as $short_name => $result) {
+	foreach ($results as $name => $result) {
+	  $dependencies = implode('</dependency><dependency>', $result['dependencies']);
+    if ($dependencies) {
+      $dependencies = "<dependency>" . $dependencies . "</dependency>";
+    }
 		$xml .= "
 <result>
-  <short_name>$short_name</short_name>
+  <name>$name</name>
   <title>{$result['title']}</title>
   <type>{$result['type']}</type>
   <author>{$result['author']}</author>
   <description>{$result['description']}</description>
   <image>{$result['image']}</image>
   <usage>{$result['usage']}</usage>
-  <project_url>{$result['project_url']}</project_url>
-  <update_url>{$result['update_url']}</update_url>
+  <project_url>{$result['project url']}</project_url>
+  <project_status_url>{$result['project status url']}</project_status_url>
+  <last_updated>{$result['last updated']}</last_updated>
+  <rating>{$result['rating']}</rating>
+  <dependencies>$dependencies</dependencies>
 </result>
 ";
 	}
@@ -142,20 +149,20 @@ function project_browser_server_xmlrpc() {
  *   'views' => array(
  *     'type' => 'module', // The type of project this is. Can be 'module' or 'theme'
  *     'title' => 'Views',
- *     'short_name' => 'views',
+ *     'name' => 'views',
  *     'author' => 'merlinofchaos',
  *     'description' => "Long project description ...",
  *     'image' => 'http://www.example.com/image.jpg', // Absolute url to the image, if any
  *     'usage' => '542312', // How many Downloads the module has had
- *     'project_url' => 'http://www.drupal.org/projects/views', // Absolute url to the project page, if any
- *     'update_url' => 'http://updates.drupal.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Drupal.org Update Status does it
- *     'last_updated' => '12342523', // UNIX Timestamp of when the project was last updated
+ *     'project url' => 'http://www.drupal.org/projects/views', // Absolute url to the project page, if any
+ *     'project status url' => 'http://updates.drupal.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Drupal.org Update Status does it
+ *     'last updated' => '12342523', // UNIX Timestamp of when the project was last updated
  *     'rating' => '9.6', // A rating on a scale of 1 to 10 of the project, if available
  *     'dependencies' => array( // An array of the dependencies of this module
  *         'ctools',
  *       ),
  *   ),
- *   'short_name_2 => array( ... ),
+ *   'name_2 => array( ... ),
  * );
  * 
  * @param $queries
