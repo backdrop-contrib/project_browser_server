@@ -157,10 +157,12 @@ function project_browser_server_xmlrpc() {
  *     'project url' => 'http://www.drupal.org/projects/views', // Absolute url to the project page, if any
  *     'project status url' => 'http://updates.drupal.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Drupal.org Update Status does it
  *     'last updated' => '12342523', // UNIX Timestamp of when the project was last updated
+ *     'maintenance status' => 'Actively maintained',
+ *     'development status' => 'Under active development',
  *     'rating' => '9.6', // A rating on a scale of 1 to 10 of the project, if available
  *     'dependencies' => array( // An array of the dependencies of this module
- *         'ctools',
- *       ),
+ *       'ctools',
+ *     ),
  *   ),
  *   'name_2 => array( ... ),
  * );
