@@ -69,15 +69,6 @@ function pbs_example_help($path, $arg) {
 function pbs_example_project_browser_server_query($filters) {
   $results = array();
   
-  switch ($filters['type']) {
-    case 'module':
-      $results = pbs_example_get_modules($filters['drupal_version'], $filters['text'], $filters['categories']);
-      break;
-    case 'theme':
-      $results = pbs_example_get_themes($filters['drupal_version'], $filters['text'], $filters['categories']);
-      break;
-  }
-  
   $projects = pbs_example_static_projects();
   
   // Filter out projects based on type
@@ -173,7 +164,7 @@ function pbs_example_get_categories($type) {
  * In most cases, this information will be pulled from various database tables.
  * This function only returns release info for Drupal 7 projects
  */
-function pbs_example_static_projects_7() {
+function pbs_example_static_projects() {
   $projects = array();
   
   $projects['views'] = array(
