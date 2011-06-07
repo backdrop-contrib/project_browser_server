@@ -165,7 +165,7 @@ function project_browser_server_xmlrpc() {
  *   'name_2 => array( ... ),
  * );
  * 
- * @param $queries
+ * @param $filters
  *   An associative array of the filters and their values
  * @return array
  *   Returns an array of results, formatted how Project Browser likes it
