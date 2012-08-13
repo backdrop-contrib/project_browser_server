@@ -14,8 +14,8 @@ function pbs_example_help($path, $arg) {
   $output = '';
   switch ($path) {
     case "admin/help#pbs_example":
-      $output .= '<p>'.  t("Demonstrates how to implement the Project Browser Server API 
-      that lets you serve search results to the Project Browser module.") .'</p>';
+      $output .= '<p>' .  t("Demonstrates how to implement the Project Browser Server API 
+      that lets you serve search results to the Project Browser module.") . '</p>';
       break;
   }
   return $output;
@@ -26,51 +26,59 @@ function pbs_example_help($path, $arg) {
 // ======================================
 
 /**
- * Implementation of hook_project_browser_server_query()
- * 
+ * Implements hook_project_browser_server_query()().
+ *
  * The function takes a $filters parameter that looks like this:
- * 
+ *
  * array(
- *   'drupal_version' => '6', // The Major Version of Drupal that is running on the Client
- *   'categories' => array(), // The categories that were selected, if any
- *   'text' => 'Views', // The text that was entered as the search query, or 'all'
+ *   'version' => '7', // The Major Version of Drupal that is running on the Client
+ *   'text' => 'views', // The text that was entered as the search query, or '' if none
+ *   'categories' => array() // The categories that were selected, if any
  *   'type' => 'module', // The type of project being searched
+ *   'page' => 3, // The zero-based page number
+ *   'requested' => 12, // How many results are requested per page
  * )
- * 
+ *
  * The function should return an array like this:
- * 
+ *
  * array(
- *   'views' => array(
- *     'type' => 'module', // The type of project this is. Can be 'module' or 'theme'
- *     'title' => 'Views',
- *     'name' => 'views',
- *     'author' => 'merlinofchaos',
- *     'description' => "Long project description ...",
- *     'image' => 'http://www.example.com/image.jpg', // Absolute url to the image, if any
- *     'usage' => '542312', // How many Downloads the module has had
- *     'project url' => 'http://www.drupal.org/projects/views', // Absolute url to the project page, if any
- *     'project status url' => 'http://updates.drupal.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Drupal.org Update Status does it
- *     'last updated' => '12342523', // UNIX Timestamp of when the project was last updated
- *     'maintenance status' => 'Actively maintained', // Maintenance status
- *     'development status' => 'Under active development', // Development status
- *     'rating' => '9.6', // A rating on a scale of 1 to 10 of the project, if available
- *     'dependencies' => array( // An array of the dependencies of this module
+ *   'total' = 5, // The total number of results found for the filters
+ *   'projects' => array( // An array of projects returned for this page request
+ *     'views' => array( // A project array keyed by the machine name
+ *       'type' => 'module', // The type of project this is. Can be 'module' or 'theme'
+ *       'title' => 'Views', // The title of the project
+ *       'name' => 'views', // The machine name of the project
+ *       'author' => 'merlinofchaos', // The author's name
+ *       'description' => "Long project description ...",
+ *       'image' => 'http://www.example.com/image.jpg', // Absolute url to the image, if any
+ *       'usage' => '542312', // How many Downloads the module has had
+ *       'project url' => 'http://www.drupal.org/projects/views', // Absolute url to the project page, if any
+ *       'project status url' => 'http://updates.drupal.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Drupal.org Update Status does it
+ *       'last updated' => '12342523', // UNIX Timestamp of when the project was last updated
+ *       'maintenance status' => 'Actively maintained', // Maintenance status
+ *       'development status' => 'Under active development', // Development status
+ *       'rating' => '9.6', // A rating on a scale of 1 to 10 of the project, if available
+ *       'dependencies' => array( // An array of the dependencies of this module
  *         'ctools',
  *       ),
- *   ),
+ *     ),
  *   'name_2 => array( ... ),
+ *   ),
  * );
- * 
+ *
  * @param $filters
  *   An associative array of the filters and their values
  * @return array
  *   Returns an array of results, formatted how Project Browser likes it
  */
 function pbs_example_project_browser_server_query($filters) {
-  $results = array();
-  
   $projects = pbs_example_static_projects();
-  
+
+  $results = array(
+    'total' => count($projects),
+    'projects' => array(),
+  );
+
   // Filter out projects based on type
   if (isset($filters['type']) AND $type = $filters['type']) {
     foreach ($projects as $name => $project) {
@@ -79,16 +87,16 @@ function pbs_example_project_browser_server_query($filters) {
       }
     }
   }
-  
+
   // Filter out projects based on drupal version number
-  if (isset($filters['drupal_version']) AND $version = $filters['drupal_version']) {
+  if (isset($filters['version']) AND $version = $filters['version']) {
     foreach ($projects as $name => $project) {
       if ($version != $project['drupal version']) {
         unset($projects[$name]);
       }
     }
   }
-  
+
   // Filter out projects based on categories number
   if (isset($filters['categories']) AND is_array($filters['categories']) AND !empty($filters['categories'])) {
     $filtered = array();
@@ -110,31 +118,45 @@ function pbs_example_project_browser_server_query($filters) {
       }
     }
   }
-  
-  $results = $projects;
-  
+
+  $results['total'] = count($projects);
+
+  // FIXME - Only send back the requested amount
+  $start = $filters['page'] * $filters['requested'];
+  $end = $start + $filters['requested'];
+
+  $results['projects'] = $projects;
+
+  // Log this for debugging purposes
+  watchdog('pbs_example', 'Query filters: !filters Results: !results', 
+    array(
+    '!filters' => '<pre>' . print_r($filters, TRUE) . '</pre>',
+    '!results' => '<pre>' . print_r($results, TRUE) . '</pre>',
+  )
+  );
+
   return $results;
 }
 
 /**
- * Implementation of hook_project_browser_server_categories()
- * 
+ * Implements hook_project_browser_server_categories()().
+ *
  * The function should return an array like this:
- * 
+ *
  * array(
- *   'category_1' => "Category 1", 
- *   'category_2' => "Category 2", 
+ *   'category_1' => "Category 1",
+ *   'category_2' => "Category 2",
  *   'category_3' => "Category 3",
  * );
- * 
+ *
  * @param $type
  *   The type of project to get the categories for, 'module' or 'theme'
  * @return array
  *   Returns an array of categories
  */
-function pbs_example_get_categories($type) {
+function pbs_example_project_browser_server_categories($type) {
   $categories = array();
-  
+
   switch ($type) {
     case 'module':
       $categories = array(
@@ -143,7 +165,7 @@ function pbs_example_get_categories($type) {
         'user_management' => "User Management",
       );
       break;
-      
+
     case 'theme':
       $categories = array(
         'dark' => "Dark",
@@ -160,17 +182,18 @@ function pbs_example_get_categories($type) {
 
 /**
  * Populate some static data to use for the example module.
- * 
+ *
  * In most cases, this information will be pulled from various database tables.
  * This function only returns release info for Drupal 7 projects
  */
 function pbs_example_static_projects() {
   $projects = array();
-  
+
   $projects['views'] = array(
     'type' => 'module',
     'title' => 'Views',
     'name' => 'views',
+    'drupal version' => 7,
     'author' => 'merlinofchaos',
     'description' => "The Views module provides a flexible method for Drupal site 
       designers to control how lists and tables of content (nodes in Views 1, almost 
@@ -190,11 +213,12 @@ function pbs_example_static_projects() {
       'ctools',
     ),
   );
-  
+
   $projects['ctools'] = array(
     'type' => 'module',
     'title' => 'Chaos Tool Suite',
     'name' => 'ctools',
+    'drupal version' => 7,
     'author' => 'merlinofchaos',
     'description' => "This suite is primarily a set of APIs and tools to improve 
       the developer experience. It also contains a module called the Page Manager 
@@ -212,11 +236,12 @@ function pbs_example_static_projects() {
     'rating' => '7.6',
     'dependencies' => array(),
   );
-  
+
   $projects['token'] = array(
     'type' => 'module',
     'title' => 'Token',
     'name' => 'token',
+    'drupal version' => 7,
     'author' => 'eaton',
     'description' => "Tokens are small bits of text that can be placed into larger 
       documents via simple placeholders, like %site-name or [user]. The Token module 
@@ -232,11 +257,12 @@ function pbs_example_static_projects() {
     'rating' => '8.1',
     'dependencies' => array(),
   );
-  
+
   $projects['zen'] = array(
     'type' => 'theme',
     'title' => 'Zen',
     'name' => 'zen',
+    'drupal version' => 7,
     'author' => 'johnAlbin',
     'description' => "Zen is the ultimate starting theme for Drupal. If you are 
       building your own standards-compliant theme, you will find it much easier to 
@@ -254,11 +280,12 @@ function pbs_example_static_projects() {
     'rating' => '7.1',
     'dependencies' => array(),
   );
-  
+
   $projects['acquia_marina'] = array(
     'type' => 'theme',
     'title' => 'Acquia Marina',
     'name' => 'acquia_marina',
+    'drupal version' => 7,
     'author' => 'stephthegeek',
     'description' => "The Fusion base theme and Skinr are required. Skinr for Drupal 7 
       (dev release) is usable now but it is recommended that you proceed with caution 
@@ -273,14 +300,15 @@ function pbs_example_static_projects() {
     'development status' => 'Under active development',
     'rating' => '7.8',
     'dependencies' => array(
-      'fusion'
+      'fusion',
     ),
   );
-  
+
   $projects['fusion'] = array(
     'type' => 'theme',
     'title' => 'Fusion',
     'name' => 'fusion',
+    'drupal version' => 7,
     'author' => 'stephthegeek',
     'description' => "Fusion is a powerful base theme, with layout and style configuration 
       options built in that you can control through Drupal's UI. It's based on a simplified 
@@ -297,6 +325,6 @@ function pbs_example_static_projects() {
     'rating' => '',
     'dependencies' => array(),
   );
-  
+
   return $projects;
 }

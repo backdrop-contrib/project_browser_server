@@ -1,203 +1,181 @@
 <?php
 
-// $Id$
 /**
  * @file
  * Project Browser Server module.
- * Authored by Leighton Whiting for Google Summer of Code 2011
  */
 
 /**
- * Display help and module information
- */
-function project_browser_server_help($path, $arg) {
-  $output = '';
-  switch ($path) {
-    case "admin/help#project_browser_server":
-      $output .= '<p>'.  t("Provides an extensible API that lets you serve search results to the 
-      Project Browser module.") .'</p>';
-      break;
-  }
-  return $output;
-}
-
-/**
- * Implementation of hook_perm().
+ * Implements hook_permission().().
  */
 function project_browser_server_permission() {
   return array(
     'access project browser server' => array(
-      'title' => t('Access Project Browser Server'),
-      'description' => t('This must be enabled for anonymous users if you want them to access your server.'),
-    )
+      'title' => t('access project browser server'),
+      'description' => t('TODO Add a description for \'access project browser server\''),
+    ),
   );
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().().
  */
 function project_browser_server_menu() {
-  $items = array();
-  $items['project_browser/server'] = array(
-    'description' => 'A page that can be queried and returns XML',
-    'page callback' => 'project_browser_server_endpoint',
+  $items['project_browser/server/query/%/%'] = array(
+    'page callback' => 'project_browser_server_query',
+    'page arguments' => array(3, 4),
     'access arguments' => array('access project browser server'),
     'type' => MENU_CALLBACK,
   );
+
+  $items['project_browser/server/categories/%'] = array(
+    'page callback' => 'project_browser_server_categories',
+    'page arguments' => array(3),
+    'access arguments' => array('access project browser server'),
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
-// ======================================
-// Pages:
-// ======================================
-
 /**
- * Page callback for the 'project_browser/server' endpoint. 
- * Queries should be sent via $_POST
- * 
- * @return
- *   Prints out the XML of the results
+ * Menu callback for the 'project_browser/server/categories' endpoint.
  */
-function project_browser_server_endpoint() {
-	// Check that we have valid data
-	if (!isset($_REQUEST['drupal_version'])) {
-		return t('You must specify a drupal version.');
-	}
-  if (!isset($_REQUEST['type'])) {
-    return t('You must specify a project type.');
+function project_browser_server_categories($type) {
+  if (!_project_browser_server_validate($type)) {
+    return;
   }
-	
-	// Get the queries and pass them off to the project_browser_server_get_results() function
-	$filters = array(
-    'drupal_version' => $_REQUEST['drupal_version'],
-    'text' => isset($_REQUEST['text']) ? $_REQUEST['text'] : '',
-	  'type' => $_REQUEST['type'],
-	);
-	
-	$results = project_browser_server_get_results($filters);
-	
-	// Serve this up as XML
-	
-	// Set page headers for the XML response.
-  header('Content-Type: text/xml; charset=utf-8');
-	
-	$xml = '<?xml version="1.0" encoding="utf-8"?>' ."\n";
-	
-	$xml .= "<results>";
-	
-	foreach ($results as $name => $result) {
-	  $dependencies = implode('</dependency><dependency>', $result['dependencies']);
-    if ($dependencies) {
-      $dependencies = "<dependency>" . $dependencies . "</dependency>";
-    }
-		$xml .= "
-<result>
-  <name>$name</name>
-  <title>{$result['title']}</title>
-  <type>{$result['type']}</type>
-  <author>{$result['author']}</author>
-  <description>{$result['description']}</description>
-  <image>{$result['image']}</image>
-  <usage>{$result['usage']}</usage>
-  <project_url>{$result['project url']}</project_url>
-  <project_status_url>{$result['project status url']}</project_status_url>
-  <last_updated>{$result['last updated']}</last_updated>
-  <rating>{$result['rating']}</rating>
-  <dependencies>$dependencies</dependencies>
-</result>
-";
-	}
-	
-	$xml .= "</results>";
-	
-  print $xml;
-  
-  exit();
-}
 
-// ======================================
-// Functions:
-// ======================================
+  _project_browser_server_return(project_browser_server_get_categories($type));
+}
 
 /**
- * Implementation of hook_xmlrpc().
- * 
- * @return
- *   Returns an array of xmlrpc functions
+ * Menu callback for the 'project_browser/server/query' endpoint.
  */
-function project_browser_server_xmlrpc() {
-	return array(
-    'project_browser_server.fetch_results' => 'project_browser_server_get_results',
-    'project_browser_server.fetch_categories' => 'project_browser_server_get_categories',
-  );
+function project_browser_server_query($type, $version) {
+  if (!_project_browser_server_validate($type)) {
+    return;
+  }
+
+  _project_browser_server_return(project_browser_server_get_results(array(
+    'version' => $version,
+    'type' => $type,
+    'text' => (isset($_GET['text']) && $_GET['text']) ? $_GET['text'] : '',
+    'order_by' => isset($_GET['order_by']) ? $_GET['order_by'] : 'usage',
+    'sort' => isset($_GET['sort']) ? $_GET['sort'] : 'desc',
+    'requested' => isset($_GET['requested']) ? (int) $_GET['requested'] : 12,
+    'page' => isset($_GET['page']) ? (int) $_GET['page'] : 0,
+    'categories' => (isset($_GET['categories']) && is_array($_GET['categories'])) ? $_GET['categories'] : array(),
+  )));
 }
+
+/**
+ * Return some JSON or JSONP to the page.
+ */
+function _project_browser_server_return($results) {
+  // JSONP
+  if ($_GET['callback']) {
+    // @todo msie9 might break with this content-type.
+    // @see http://stackoverflow.com/questions/111302/best-content-type-to-serve-jsonp/111306#111306
+    drupal_add_http_header('Content-Type', 'application/javascript; charset=utf-8');
+    print $_GET['callback'] . '(' . drupal_json_encode($results) . ');';
+  }
+  else {
+    drupal_add_http_header('Content-Type', 'application/json; charset=utf-8');
+    print drupal_json_encode($results);
+  }
+}
+
+/**
+ * Validate a Project Browser request.
+ */
+function _project_browser_server_validate($type) {
+  if ($type != 'module' && $type != 'theme') {
+    drupal_add_http_header('Status', '404 Not Found');
+
+    _project_browser_server_return(t('You must specify a project type to be either "module" or "theme".'));
+    return FALSE;
+  }
+  return TRUE;
+}
+
 
 /**
  * Invokes hook_project_browser_server_query to get results of a search query
- * 
+ *
  * The hook_project_browser_server_query function takes a $filters parameter that looks like this:
- * 
+ *
  * array(
- *   'drupal_version' => '6.x', // The Major Version of Drupal that is running on the Client
- *   'text' => 'Views', // The text that was entered as the search query, or 'all'
+ *   'version' => '7', // The Major Version of Drupal that is running on the Client
+ *   'text' => 'views', // The text that was entered as the search query, or '' if none
+ *   'categories' => array() // The categories that were selected, if any
  *   'type' => 'module', // The type of project being searched
+ *   'page' => 3, // The zero-based page number
+ *   'requested' => 12, // How many results are requested per page
  * )
- * 
+ *
  * The hook_project_browser_server_query($filters) call should return an array like this:
- * 
+ *
  * array(
- *   'views' => array(
- *     'type' => 'module', // The type of project this is. Can be 'module' or 'theme'
- *     'title' => 'Views',
- *     'name' => 'views',
- *     'author' => 'merlinofchaos',
- *     'description' => "Long project description ...",
- *     'image' => 'http://www.example.com/image.jpg', // Absolute url to the image, if any
- *     'usage' => '542312', // How many Downloads the module has had
- *     'project url' => 'http://www.drupal.org/projects/views', // Absolute url to the project page, if any
- *     'project status url' => 'http://updates.drupal.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Drupal.org Update Status does it
- *     'last updated' => '12342523', // UNIX Timestamp of when the project was last updated
- *     'maintenance status' => 'Actively maintained',
- *     'development status' => 'Under active development',
- *     'rating' => '9.6', // A rating on a scale of 1 to 10 of the project, if available
- *     'dependencies' => array( // An array of the dependencies of this module
- *       'ctools',
+ *   'total' = 5, // The total number of results found for the filters
+ *   'projects' => array( // An array of projects returned for this page request
+ *     'views' => array( // A project array keyed by the machine name
+ *       'type' => 'module', // The type of project this is. Can be 'module' or 'theme'
+ *       'title' => 'Views', // The title of the project
+ *       'name' => 'views', // The machine name of the project
+ *       'author' => 'merlinofchaos', // The author's name
+ *       'description' => "Long project description ...",
+ *       'image' => 'http://www.example.com/image.jpg', // Absolute url to the image, if any
+ *       'usage' => '542312', // How many Downloads the module has had
+ *       'project url' => 'http://www.drupal.org/projects/views', // Absolute url to the project page, if any
+ *       'project status url' => 'http://updates.drupal.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Drupal.org Update Status does it
+ *       'last updated' => '12342523', // UNIX Timestamp of when the project was last updated
+ *       'maintenance status' => 'Actively maintained', // Maintenance status
+ *       'development status' => 'Under active development', // Development status
+ *       'rating' => '9.6', // A rating on a scale of 1 to 10 of the project, if available
+ *       'dependencies' => array( // An array of the dependencies of this module
+ *         'ctools',
+ *       ),
  *     ),
- *   ),
  *   'name_2 => array( ... ),
+ *   ),
  * );
- * 
+ *
  * @param $filters
  *   An associative array of the filters and their values
  * @return array
  *   Returns an array of results, formatted how Project Browser likes it
  */
 function project_browser_server_get_results($filters) {
-	$results = module_invoke_all('project_browser_server_query', $filters);
-  
-  // TODO - Maybe do some error checking here to ensure proper formatting
-  
-	return $results;
+  $pbs_modules = module_implements('project_browser_server_query');
+  if (count($pbs_modules) != 1) {
+    return FALSE;
+  }
+  $function = $pbs_modules[0] . '_project_browser_server_query';
+  return $function($filters);
 }
 
 /**
  * Invokes hook_project_browser_server_categories to get a list of categories
- * 
+ *
  * The hook_project_browser_server_categories($type) call should return an array like this:
- * 
+ *
  * array(
- *   "Category 1", 
- *   "Category 2", 
- *   "Category 3",
+ *   'cat1' => "Category 1",
+ *   'cat2' => "Category 2",
+ *   'cat3' => "Category 3",
  * );
- * 
+ *
  * @param $type
  *   The type of project to get the categories for, 'module' or 'theme'
  * @return array
  *   Returns an array of categories
  */
 function project_browser_server_get_categories($type) {
-  $categories = module_invoke_all('project_browser_server_categories', $type);
-  
-  return $categories;
+  $pbs_modules = module_implements('project_browser_server_categories');
+  if (count($pbs_modules) != 1) {
+    return FALSE;
+  }
+  $function = $pbs_modules[0] . '_project_browser_server_categories';
+  return $function($type);
 }
