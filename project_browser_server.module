@@ -56,6 +56,8 @@ function project_browser_server_query($type, $version) {
   if (!_project_browser_server_validate($type)) {
     return;
   }
+	
+	$_GET['categories'] = unserialize($_GET['categories']);
 
   _project_browser_server_return(project_browser_server_get_results(array(
     'version' => $version,
