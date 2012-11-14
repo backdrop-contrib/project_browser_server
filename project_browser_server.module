@@ -74,7 +74,7 @@ function project_browser_server_query($type, $version) {
  */
 function _project_browser_server_return($results) {
   // JSONP
-  if ($_GET['callback']) {
+  if (!empty($_GET['callback'])) {
     // @todo msie9 might break with this content-type.
     // @see http://stackoverflow.com/questions/111302/best-content-type-to-serve-jsonp/111306#111306
     drupal_add_http_header('Content-Type', 'application/javascript; charset=utf-8');
