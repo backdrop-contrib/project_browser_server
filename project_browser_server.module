@@ -79,12 +79,12 @@ function _project_browser_server_return($results) {
   if (!empty($_GET['callback'])) {
     // @todo msie9 might break with this content-type.
     // @see http://stackoverflow.com/questions/111302/best-content-type-to-serve-jsonp/111306#111306
-    drupal_add_http_header('Content-Type', 'application/javascript; charset=utf-8');
-    print $_GET['callback'] . '(' . drupal_json_encode($results) . ');';
+    backdrop_add_http_header('Content-Type', 'application/javascript; charset=utf-8');
+    print $_GET['callback'] . '(' . backdrop_json_encode($results) . ');';
   }
   else {
-    drupal_add_http_header('Content-Type', 'application/json; charset=utf-8');
-    print drupal_json_encode($results);
+    backdrop_add_http_header('Content-Type', 'application/json; charset=utf-8');
+    print backdrop_json_encode($results);
   }
 }
 
@@ -93,7 +93,7 @@ function _project_browser_server_return($results) {
  */
 function _project_browser_server_validate($type) {
   if ($type != 'module' && $type != 'theme') {
-    drupal_add_http_header('Status', '404 Not Found');
+    backdrop_add_http_header('Status', '404 Not Found');
 
     _project_browser_server_return(t('You must specify a project type to be either "module" or "theme".'));
     return FALSE;
@@ -108,7 +108,7 @@ function _project_browser_server_validate($type) {
  * The hook_project_browser_server_query function takes a $filters parameter that looks like this:
  *
  * array(
- *   'version' => '7', // The Major Version of Drupal that is running on the Client
+ *   'version' => '7', // The Major Version of Backdrop that is running on the Client
  *   'text' => 'views', // The text that was entered as the search query, or '' if none
  *   'categories' => array() // The categories that were selected, if any
  *   'type' => 'module', // The type of project being searched
@@ -129,8 +129,8 @@ function _project_browser_server_validate($type) {
  *       'description' => "Long project description ...",
  *       'image' => 'http://www.example.com/image.jpg', // Absolute url to the image, if any
  *       'usage' => '542312', // How many Downloads the module has had
- *       'project url' => 'http://www.drupal.org/projects/views', // Absolute url to the project page, if any
- *       'project status url' => 'http://updates.drupal.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Drupal.org Update Status does it
+ *       'project url' => 'http://www.backdrop.org/projects/views', // Absolute url to the project page, if any
+ *       'project status url' => 'http://updates.backdrop.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Backdrop.org Update Status does it
  *       'last updated' => '12342523', // UNIX Timestamp of when the project was last updated
  *       'maintenance status' => 'Actively maintained', // Maintenance status
  *       'development status' => 'Under active development', // Development status

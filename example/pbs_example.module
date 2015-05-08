@@ -31,7 +31,7 @@ function pbs_example_help($path, $arg) {
  * The function takes a $filters parameter that looks like this:
  *
  * array(
- *   'version' => '7', // The Major Version of Drupal that is running on the Client
+ *   'version' => '7', // The Major Version of Backdrop that is running on the Client
  *   'text' => 'views', // The text that was entered as the search query, or '' if none
  *   'categories' => array() // The categories that were selected, if any
  *   'type' => 'module', // The type of project being searched
@@ -52,8 +52,8 @@ function pbs_example_help($path, $arg) {
  *       'description' => "Long project description ...",
  *       'image' => 'http://www.example.com/image.jpg', // Absolute url to the image, if any
  *       'usage' => '542312', // How many Downloads the module has had
- *       'project url' => 'http://www.drupal.org/projects/views', // Absolute url to the project page, if any
- *       'project status url' => 'http://updates.drupal.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Drupal.org Update Status does it
+ *       'project url' => 'http://www.backdrop.org/projects/views', // Absolute url to the project page, if any
+ *       'project status url' => 'http://updates.backdrop.org/release-history/views/7.x', // The absolute url of the update checker, formatted like how Backdrop.org Update Status does it
  *       'last updated' => '12342523', // UNIX Timestamp of when the project was last updated
  *       'maintenance status' => 'Actively maintained', // Maintenance status
  *       'development status' => 'Under active development', // Development status
@@ -88,10 +88,10 @@ function pbs_example_project_browser_server_query($filters) {
     }
   }
 
-  // Filter out projects based on drupal version number
+  // Filter out projects based on backdrop version number
   if (isset($filters['version']) AND $version = $filters['version']) {
     foreach ($projects as $name => $project) {
-      if ($version != $project['drupal version']) {
+      if ($version != $project['backdrop version']) {
         unset($projects[$name]);
       }
     }
@@ -184,7 +184,7 @@ function pbs_example_project_browser_server_categories($type) {
  * Populate some static data to use for the example module.
  *
  * In most cases, this information will be pulled from various database tables.
- * This function only returns release info for Drupal 7 projects
+ * This function only returns release info for Backdrop 7 projects
  */
 function pbs_example_static_projects() {
   $projects = array();
@@ -193,18 +193,18 @@ function pbs_example_static_projects() {
     'type' => 'module',
     'title' => 'Views',
     'name' => 'views',
-    'drupal version' => 7,
+    'backdrop version' => 7,
     'author' => 'merlinofchaos',
-    'description' => "The Views module provides a flexible method for Drupal site 
+    'description' => "The Views module provides a flexible method for Backdrop site 
       designers to control how lists and tables of content (nodes in Views 1, almost 
-      anything in Views 2) are presented. Traditionally, Drupal has hard-coded most of 
+      anything in Views 2) are presented. Traditionally, Backdrop has hard-coded most of 
       this, particularly in how taxonomy and tracker lists are formatted. ",
-    'drupal_versions' => array(6, 7),
+    'backdrop_versions' => array(6, 7),
     'categories' => array('admin', 'search'),
     'image' => 'http://learnbythedrop.com/system/files/images/View-Edit_0.png',
     'usage' => '542312',
-    'project url' => 'http://www.drupal.org/projects/views',
-    'project status url' => 'http://updates.drupal.org/release-history/views/7.x',
+    'project url' => 'http://www.backdrop.org/projects/views',
+    'project status url' => 'http://updates.backdrop.org/release-history/views/7.x',
     'last updated' => '12342523',
     'maintenance status' => 'Actively maintained',
     'development status' => 'Under active development',
@@ -218,18 +218,18 @@ function pbs_example_static_projects() {
     'type' => 'module',
     'title' => 'Chaos Tool Suite',
     'name' => 'ctools',
-    'drupal version' => 7,
+    'backdrop version' => 7,
     'author' => 'merlinofchaos',
     'description' => "This suite is primarily a set of APIs and tools to improve 
       the developer experience. It also contains a module called the Page Manager 
       whose job is to manage pages. In particular it manages panel pages, but as 
       it grows it will be able to manage far more than just Panels.",
-    'drupal_versions' => array(6, 7),
+    'backdrop_versions' => array(6, 7),
     'categories' => array(),
     'image' => '',
     'usage' => '4312',
-    'project url' => 'http://www.drupal.org/projects/ctools',
-    'project status url' => 'http://updates.drupal.org/release-history/ctools/7.x',
+    'project url' => 'http://www.backdrop.org/projects/ctools',
+    'project status url' => 'http://updates.backdrop.org/release-history/ctools/7.x',
     'last updated' => '12354634',
     'maintenance status' => 'Actively maintained',
     'development status' => 'Under active development',
@@ -241,16 +241,16 @@ function pbs_example_static_projects() {
     'type' => 'module',
     'title' => 'Token',
     'name' => 'token',
-    'drupal version' => 7,
+    'backdrop version' => 7,
     'author' => 'eaton',
     'description' => "Tokens are small bits of text that can be placed into larger 
       documents via simple placeholders, like %site-name or [user]. The Token module 
       provides a central API for modules to use these tokens, and expose their own token values.",
     'categories' => array('admin'),
-    'image' => 'http://drupal.org/files/images/token_08.thumbnail.png',
+    'image' => 'http://backdrop.org/files/images/token_08.thumbnail.png',
     'usage' => '4563',
-    'project url' => 'http://www.drupal.org/projects/token',
-    'project status url' => 'http://updates.drupal.org/release-history/token/7.x',
+    'project url' => 'http://www.backdrop.org/projects/token',
+    'project status url' => 'http://updates.backdrop.org/release-history/token/7.x',
     'last updated' => '12357351',
     'maintenance status' => 'Actively maintained',
     'development status' => 'Under active development',
@@ -262,18 +262,18 @@ function pbs_example_static_projects() {
     'type' => 'theme',
     'title' => 'Zen',
     'name' => 'zen',
-    'drupal version' => 7,
+    'backdrop version' => 7,
     'author' => 'johnAlbin',
-    'description' => "Zen is the ultimate starting theme for Drupal. If you are 
+    'description' => "Zen is the ultimate starting theme for Backdrop. If you are 
       building your own standards-compliant theme, you will find it much easier to 
       start with Zen than to start with Garland or Bluemarine. This theme has fantastic 
       online documentation and tons of code comments for both the PHP (template.php) 
       and HTML (page.tpl.php, node.tpl.php).",
     'categories' => array('light', 'dark'),
-    'image' => 'http://drupal.org/files/images/zen-logo.thumbnail.png',
+    'image' => 'http://backdrop.org/files/images/zen-logo.thumbnail.png',
     'usage' => '4563',
-    'project url' => 'http://www.drupal.org/project/zen',
-    'project status url' => 'http://updates.drupal.org/release-history/zen/7.x',
+    'project url' => 'http://www.backdrop.org/project/zen',
+    'project status url' => 'http://updates.backdrop.org/release-history/zen/7.x',
     'last updated' => '12343634',
     'maintenance status' => 'Actively maintained',
     'development status' => 'Under active development',
@@ -285,16 +285,16 @@ function pbs_example_static_projects() {
     'type' => 'theme',
     'title' => 'Acquia Marina',
     'name' => 'acquia_marina',
-    'drupal version' => 7,
+    'backdrop version' => 7,
     'author' => 'stephthegeek',
-    'description' => "The Fusion base theme and Skinr are required. Skinr for Drupal 7 
+    'description' => "The Fusion base theme and Skinr are required. Skinr for Backdrop 7 
       (dev release) is usable now but it is recommended that you proceed with caution 
       and do some of your own testing.",
     'categories' => array('light'),
-    'image' => 'http://drupal.org/files/images/acquia_marina.thumbnail.png',
+    'image' => 'http://backdrop.org/files/images/acquia_marina.thumbnail.png',
     'usage' => '14563',
-    'project url' => 'http://www.drupal.org/project/acquia_marina',
-    'project status url' => 'http://updates.drupal.org/release-history/acquia_marina/7.x',
+    'project url' => 'http://www.backdrop.org/project/acquia_marina',
+    'project status url' => 'http://updates.backdrop.org/release-history/acquia_marina/7.x',
     'last updated' => '12346574',
     'maintenance status' => 'Actively maintained',
     'development status' => 'Under active development',
@@ -308,17 +308,17 @@ function pbs_example_static_projects() {
     'type' => 'theme',
     'title' => 'Fusion',
     'name' => 'fusion',
-    'drupal version' => 7,
+    'backdrop version' => 7,
     'author' => 'stephthegeek',
     'description' => "Fusion is a powerful base theme, with layout and style configuration 
-      options built in that you can control through Drupal's UI. It's based on a simplified 
+      options built in that you can control through Backdrop's UI. It's based on a simplified 
       960px or fluid 12/16-column grid. It's designed to be used with the Skinr module, 
       with numerous useful block styles included.",
     'categories' => array('light'),
-    'image' => 'http://drupal.org/files/images/fusion-powering-small-banner.thumbnail.png',
+    'image' => 'http://backdrop.org/files/images/fusion-powering-small-banner.thumbnail.png',
     'usage' => '14563',
-    'project url' => 'http://www.drupal.org/project/fusion',
-    'project status url' => 'http://updates.drupal.org/release-history/fusion/7.x',
+    'project url' => 'http://www.backdrop.org/project/fusion',
+    'project status url' => 'http://updates.backdrop.org/release-history/fusion/7.x',
     'last updated' => '12342643',
     'maintenance status' => 'Actively maintained',
     'development status' => 'Under active development',
