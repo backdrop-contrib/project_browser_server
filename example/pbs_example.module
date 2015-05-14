@@ -26,7 +26,8 @@ function pbs_example_help($path, $arg) {
 // ======================================
 
 /**
- * Implements hook_project_browser_server_query()().
+ * Implements hook_project_browser_server_query()
+().
  *
  * The function takes a $filters parameter that looks like this:
  *
@@ -139,7 +140,8 @@ function pbs_example_project_browser_server_query($filters) {
 }
 
 /**
- * Implements hook_project_browser_server_categories()().
+ * Implements hook_project_browser_server_categories()
+().
  *
  * The function should return an array like this:
  *
@@ -323,6 +325,125 @@ function pbs_example_static_projects() {
     'maintenance status' => 'Actively maintained',
     'development status' => 'Under active development',
     'rating' => '',
+    'dependencies' => array(),
+  );
+  
+  $projects['colorbox'] = array(
+    'type' => 'module',
+    'title' => 'Colorbox',
+    'name' => 'colorbox',
+    'backdrop version' => 1,
+    'author' => 'jonsson',
+    'description' => "This is a very simple module that opens up images or content from your Backdrop site into a popup/modal 'lightbox' and is very customizable. Colorbox is a light-weight, customizable lightbox plugin for jQuery 1.4.3+. This module allows for integration of Colorbox into Backdrop.",
+    'backdrop_versions' => array(1),
+    'categories' => array('admin', 'search'),
+    'image' => 'https://www.drupal.org/files/styles/grid-3/public/images/colorbox.png',
+    'usage' => '249103',
+    'project url' => 'https://github.com/backdrop-contrib/colorbox',
+    'project status url' => 'https://github.com/backdrop-contrib/colorbox/releases',
+    'last updated' => '14316037',
+    'maintenance status' => 'Actively maintained',
+    'development status' => 'Under active development',
+    'rating' => '9.6',
+    'dependencies' => array(
+      'libraries api',
+    ),
+  );
+
+  $projects['views_slideshow'] = array(
+    'type' => 'module',
+    'title' => 'Views Slideshow',
+    'name' => 'views_slideshow',
+    'backdrop version' => 1,
+    'author' => 'aaronwinborn',
+    'description' => "Views Slideshow can be used to create a slideshow of any content (not just images) that can appear in a View. Powered by jQuery, it is heavily customizable: you may choose slideshow settings for each View you create.",
+    'backdrop_versions' => array(1),
+    'categories' => array('admin','search'),
+    'image' => 'http://www.oliverweb.net/backdrop/files/photogallery/RiverDeben.jpg',
+    'usage' => '271401',
+    'project url' => 'https://github.com/backdrop-contrib/views_slideshow',
+    'project status url' => 'https://github.com/backdrop-contrib/views_slideshow/releases',
+    'last updated' => '14316037',
+    'maintenance status' => 'Actively maintained',
+    'development status' => 'Under active development',
+    'rating' => '7.6',
+    'dependencies' => array(),
+  );
+
+  $projects['ckeditor'] = array(
+    'type' => 'module',
+    'title' => 'CKEditor for Backdrop',
+    'name' => 'ckeditor',
+    'backdrop version' => 1,
+    'author' => 'walc',
+    'description' => "This module is a port to Backdrop of the Drupal contributed module 'CKEditor - WYSIWYG HTML editor'. It allows Backdrop to replace textarea fields with CKEditor. This module provides a link between Backdrop and the CKEditor library which may either be downloaded from http://ckeditor.com/download or may be linked from CDN - //cdn.ckeditor.com/4.4.3/full-all.
+CKEditor is an online rich text editor that can be embedded inside web pages. It is a WYSIWYG (What You See Is What You Get) editor which means that the text edited in it looks as similar as possible to the results end users will see after the document gets published. It brings to the Web popular editing features found in desktop word processors such as Microsoft Word and OpenOffice.org Writer. CKEditor is truly lightweight and does not require any kind of installation on the client computer.",
+    'categories' => array('admin','search'),
+    'image' => 'https://www.drupal.org/files/styles/grid-3/public/project-images/classic_example_0.png',
+    'usage' => '363449',
+    'project url' => 'https://github.com/backdrop-contrib/ckeditor',
+    'project status url' => 'https://github.com/backdrop-contrib/ckeditor/releases',
+    'last updated' => '12357351',
+    'maintenance status' => 'Actively maintained',
+    'development status' => 'Under active development',
+    'rating' => '8.1',
+    'dependencies' => array(),
+  );
+
+  $projects['radix'] = array(
+    'type' => 'theme',
+    'title' => 'Radix',
+    'name' => 'radix',
+    'backdrop version' => 1,
+    'author' => 'arshad',
+    'description' => "Radix is a base theme for Backdrop. It has Bootstrap and Sass, and makes it easy to build responsive themes.",
+    'categories' => array('light', 'dark'),
+    'image' => 'https://www.drupal.org/files/styles/grid-3/public/project-images/screenshot_127.png',
+    'usage' => '2794',
+    'project url' => 'https://github.com/backdrop-contrib/radix',
+    'project status url' => 'https://github.com/backdrop-contrib/radix/releases',
+    'last updated' => '12343634',
+    'maintenance status' => 'Actively maintained',
+    'development status' => 'Under active development',
+    'rating' => '7.1',
+    'dependencies' => array(),
+  );
+  
+  $projects['pure_css'] = array(
+    'type' => 'theme',
+    'title' => 'Pure CSS',
+    'name' => 'pure_css',
+    'backdrop version' => 1,
+    'author' => 'biolithic',
+    'description' => "This is a black and white blank canvas theme using Pure CSS by Yahoo! for more mobile friendly page elements.  This theme is based on of Xtheme for Drupal. https://www.drupal.org/project/xtheme Special thanks to https://www.drupal.org/u/frankbaele for this great work! This theme uses the PureCSS CSS toolkit from Yahoo! Special thanks to the developers at Yahoo! for this great work!",
+    'categories' => array('light', 'dark'),
+    'image' => 'https://github.com/backdrop-contrib/pure_css/blob/master/screenshot.png?raw=true',
+    'usage' => '2794',
+    'project url' => 'https://github.com/backdrop-contrib/pure_css',
+    'project status url' => 'https://github.com/backdrop-contrib/pure_css/archive/master.zip',
+    'last updated' => '12343634',
+    'maintenance status' => 'Actively maintained',
+    'development status' => 'Under active development',
+    'rating' => '7.1',
+    'dependencies' => array(),
+  );
+  
+  $projects['summer_fun'] = array(
+    'type' => 'theme',
+    'title' => 'Summer Fun',
+    'name' => 'summer_fun',
+    'backdrop version' => 1,
+    'author' => 'biolithic',
+    'description' => "Summer Fun is a sand-coloured 'pretty' theme for something nice out of the box. It has a rounded, happy feel and is probably good for blogs or websites with a fun, breezy tone.",
+    'categories' => array('light', 'dark'),
+    'image' => 'https://github.com/backdrop-contrib/summer_fun/blob/master/screenshot.png?raw=true',
+    'usage' => '2794',
+    'project url' => 'https://github.com/backdrop-contrib/summer_fun',
+    'project status url' => 'https://github.com/backdrop-contrib/summer_fun/archive/master.zip',
+    'last updated' => '12343634',
+    'maintenance status' => 'Actively maintained',
+    'development status' => 'Under active development',
+    'rating' => '7.1',
     'dependencies' => array(),
   );
 
