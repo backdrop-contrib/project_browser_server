@@ -87,6 +87,7 @@ function _project_browser_server_return($results) {
   else {
     backdrop_add_http_header('Content-Type', 'application/json; charset=utf-8');
     print backdrop_json_encode($results);
+    backdrop_exit();
   }
 }
 
