@@ -6,7 +6,8 @@
  */
 
 /**
- * Implements hook_permission().().
+ * Implements hook_permission().
+().
  */
 function project_browser_server_permission() {
   return array(
@@ -18,7 +19,8 @@ function project_browser_server_permission() {
 }
 
 /**
- * Implements hook_menu().().
+ * Implements hook_menu().
+().
  */
 function project_browser_server_menu() {
   $items['project_browser/server/query/%/%'] = array(
@@ -57,7 +59,7 @@ function project_browser_server_query($type, $version) {
     return;
   }
 	
-	$_GET['categories'] = unserialize($_GET['categories']);
+  if (isset($_GET['categories'])) {$_GET['categories'] = unserialize($_GET['categories']);}
 
   _project_browser_server_return(project_browser_server_get_results(array(
     'version' => $version,
