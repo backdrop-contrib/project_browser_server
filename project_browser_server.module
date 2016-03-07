@@ -114,7 +114,7 @@ function _project_browser_server_validate($type) {
  *   'categories' => array() // The categories that were selected, if any
  *   'type' => 'module', // The type of project being searched
  *   'page' => 3, // The zero-based page number
- *   'requested' => 12, // How many results are requested per page
+ *   'items_per_page' => 12, // How many results are requested per page
  * )
  *
  * The hook_project_browser_server_query($filters) call should return an array like this:
